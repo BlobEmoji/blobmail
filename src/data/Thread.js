@@ -41,8 +41,8 @@ class Thread {
     const mainRole = utils.getMainRole(moderator);
 
     if (isAnonymous) {
-      modUsername = (mainRole ? mainRole.name : 'Moderator');
-      logModUsername = `(Anonymous) (${moderator.user.username}) ${mainRole ? mainRole.name : 'Moderator'}`;
+      modUsername = 'Blob Police';
+      logModUsername = `(Anonymous) (${moderator.user.username}) ${modUsername}`;
     } else {
       const name = (config.useNicknames ? moderator.nick || moderator.user.username : moderator.user.username);
       modUsername = (mainRole ? `(${mainRole.name}) ${name}` : name);
