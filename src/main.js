@@ -42,7 +42,7 @@ bot.on('ready', () => {
  */
 bot.on('messageCreate', async msg => {
   if (! utils.messageIsOnInboxServer(msg)) return;
-  if (msg.author.bot) return;
+  if (msg.author.bot && msg.author.id == bot.user.id) return;
 
   const thread = await threads.findByChannelId(msg.channel.id);
   if (! thread) return;
@@ -98,7 +98,7 @@ bot.on('messageCreate', async msg => {
  */
 bot.on('messageUpdate', async (msg, oldMessage) => {
   if (! msg || ! msg.author) return;
-  if (msg.author.bot) return;
+  if (msg.author.bot && msg.author.id == bot.user.id) return;
   if (await blocked.isBlocked(msg.author.id)) return;
 
   // Old message content doesn't persist between bot restarts
@@ -131,7 +131,7 @@ bot.on('messageUpdate', async (msg, oldMessage) => {
  */
 bot.on('messageDelete', async msg => {
   if (! msg.author) return;
-  if (msg.author.bot) return;
+  if (msg.author.bot && msg.author.id == bot.user.id) return;
   if (! utils.messageIsOnInboxServer(msg)) return;
   if (! utils.isStaff(msg.member)) return;
 
