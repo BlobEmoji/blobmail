@@ -9,6 +9,7 @@ Inspired by Reddit's modmail system.
 
 ## Table of contents
 - [Setup](#setup)
+- [Support server](#support-server)
 - [Changelog](#changelog)
 - [Commands](#commands)
   - [Anywhere on the inbox server](#anywhere-on-the-inbox-server)
@@ -27,6 +28,11 @@ Inspired by Reddit's modmail system.
 5. Install dependencies: `npm ci`
 6. Add bot to servers, and make sure to give it proper permissions on the mail server.
 7. Run the bot: `npm start`
+
+## Support server
+If you need help with setting up the bot or would like to discuss other things related to the bot, join the support server on Discord here:
+
+https://discord.gg/vRuhG9R
 
 ## Changelog
 See [CHANGELOG.md](CHANGELOG.md)
@@ -130,9 +136,13 @@ This function will be called when the plugin is loaded with an object that has t
 * `bot` - the [Eris Client object](https://abal.moe/Eris/docs/Client)
 * `knex` - the [Knex database object](https://knexjs.org/#Builder)
 * `config` - the loaded config
-* `commands` - an object with functions to add and manage commands (see bottom of [src/commands.js](src/commands.js))
+* `commands` - an object with functions to add and manage commands
+* `attachments` - an object with functions to save attachments and manage attachment storage types
+
+See [src/plugins.js#L4](src/plugins.js#L4) for more details
 
 #### Example plugin file
+This example adds a command `!mycommand` that replies with `"Reply from my custom plugin!"` when the command is used inside a modmail inbox thread channel.
 ```js
 module.exports = function({ bot, knex, config, commands }) {
   commands.addInboxThreadCommand('mycommand', [], (msg, args, thread) => {
@@ -142,6 +152,17 @@ module.exports = function({ bot, knex, config, commands }) {
 ```
 
 (Note the use of [object destructuring](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Unpacking_fields_from_objects_passed_as_function_parameter) in the function parameters)
+
+#### Example of a custom attachment storage type
+This example adds a custom type for the `attachmentStorage` option called `"original"` that simply returns the original attachment URL without rehosting it in any way.
+```js
+module.exports = function({ attachments }) {
+  attachments.addStorageType('original', attachment => {
+    return { url: attachment.url };
+  });
+};
+```
+To use this custom attachment storage type, you would set the `attachmentStorage` config option to `"original"`. 
 
 ### Work in progress
 The current plugin API is fairly rudimentary and will be expanded in the future.

@@ -7,6 +7,7 @@ const knex = require('./knex');
 const {messageQueue} = require('./queue');
 const utils = require('./utils');
 const { createCommandManager } = require('./commands');
+const { getPluginAPI, loadPlugin } = require('./plugins');
 
 const blocked = require('./data/blocked');
 const threads = require('./data/threads');
@@ -264,9 +265,8 @@ function initPlugins() {
     }
   }
 
-  plugins.forEach(pluginFn => {
-    pluginFn({ bot, knex, config, commands });
-  });
+  const pluginApi = getPluginAPI({ bot, knex, config, commands });
+  plugins.forEach(pluginFn => loadPlugin(pluginFn, pluginApi));
 
   console.log(`Loaded ${plugins.length} plugins (${builtInPlugins.length} built-in plugins, ${plugins.length - builtInPlugins.length} external plugins)`);
 
