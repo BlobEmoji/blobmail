@@ -35,18 +35,20 @@ module.exports = {
     console.log('Connecting to Discord...');
 
     bot.once('ready', async () => {
-      console.log('Connected, waiting for guilds to become available');
+      console.log('Connected! Waiting for guilds to become available...');
       await Promise.all([
         ...config.mainGuildId.map(id => waitForGuild(id)),
         waitForGuild(config.mailGuildId)
       ]);
 
-      console.log('Initializing');
+      console.log('Initializing...');
       initStatus();
       initBaseMessageHandlers();
       initPlugins();
 
+      console.log('');
       console.log('Done! Now listening to DMs.');
+      console.log('');
     });
 
     bot.connect();
@@ -121,6 +123,7 @@ function initBaseMessageHandlers() {
     // Private message handling is queued so e.g. multiple message in quick succession don't result in multiple channels being created
     messageQueue.add(async () => {
       let thread = await threads.findOpenThreadByUserId(msg.author.id);
+
 
       // New thread
       if (! thread) {
@@ -209,10 +212,11 @@ function initBaseMessageHandlers() {
     const staffMention = (config.pingOnBotMention ? utils.getInboxMention() : '');
 
     if (mainGuilds.length === 1) {
-      content = `${staffMention}Bot mentioned in ${msg.channel.mention} by **${msg.author.username}#${msg.author.discriminator}**: "${msg.cleanContent}"`;
+        content = `${staffMention}Bot mentioned in ${msg.channel.mention} by **${msg.author.username}#${msg.author.discriminator}(${msg.author.id})**: "${msg.cleanContent}"\n\n<https:\/\/discordapp.com\/channels\/${msg.channel.guild.id}\/${msg.channel.id}\/${msg.id}>`;
     } else {
-      content = `${staffMention}Bot mentioned in ${msg.channel.mention} (${msg.channel.guild.name}) by **${msg.author.username}#${msg.author.discriminator}**: "${msg.cleanContent}"`;
+        content = `${staffMention}Bot mentioned in ${msg.channel.mention} (${msg.channel.guild.name}) by **${msg.author.username}#${msg.author.discriminator}(${msg.author.id})**: "${msg.cleanContent}"\n\n<https:\/\/discordapp.com\/channels\/${msg.channel.guild.id}\/${msg.channel.id}\/${msg.id}>`;
     }
+
 
     bot.createMessage(utils.getLogChannel().id, {
       content,
@@ -221,7 +225,8 @@ function initBaseMessageHandlers() {
 
     // Send an auto-response to the mention, if enabled
     if (config.botMentionResponse) {
-      bot.createMessage(msg.channel.id, config.botMentionResponse.replace(/{userMention}/g, `<@${msg.author.id}>`));
+      const botMentionResponse = utils.readMultilineConfigValue(config.botMentionResponse);
+      bot.createMessage(msg.channel.id, botMentionResponse.replace(/{userMention}/g, `<@${msg.author.id}>`));
     }
   });
 }
